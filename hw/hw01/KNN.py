@@ -2,6 +2,7 @@ import util
 import numpy as np
 from importlib import reload
 reload(util)
+import copy
 
 class KNN():
     """ K Nearest Neighbors Classifier 
@@ -58,7 +59,12 @@ class KNN():
             mode = util.mode(value_list)
             if len(mode) > 1:
                 not_done = True
+                numloops = 0
+                initarray = copy.deepcopy(important_indices)
                 while not_done:
+                    numloops = numloops + 1                    
+                    if (numloops == 6):
+                        break
                     for i in range(len(important_indices)):
                         if distances[important_indices[i]] < min:
                             min = distances[important_indices[i]]
@@ -68,6 +74,9 @@ class KNN():
                         return self.Y[minIndex]
                     else:
                         distances[minIndex] = super_large_number
+                        min = super_large_number
+                print(initarray)
+                print(important_indices)
             return mode[0]
         elif (self.task == "Regression"):
             unweighted_avg = sum(value_list) / len(value_list)

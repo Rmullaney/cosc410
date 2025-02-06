@@ -10,13 +10,27 @@ def splitData(csv:str, k:int) -> list[np.array]:
         csv: filename of data
         k: integer which specifies how many folds to make
     Output:
-        numpy array split into k folds
+        nested: index 0 holds test data, index 1 holds nested array of training numpy array split into k folds
     """
 
     df = pd.read_csv(csv)
+
+    ## Test code ##
+
+    # df = df.iloc[:2000]
+
+    ##  ##   ##  ##
+
+    ##split into train/test
+
+    test = int(len(df) / 5)
+    test_df = df.iloc[:test]
+    test_array = test_df.to_numpy()
+    df = df.iloc[test:]
+
     array = df.to_numpy()
     new_array = np.array_split(array, k)
-    return new_array
+    return [test_array, new_array]
 
     # test_fold = new_array[partition-1]
     # if (partition == k):
@@ -163,6 +177,7 @@ def fscore(pred, true, f_val):
         hits_given_pred = 0
         hits_given_true = 0
         for k in range(len(true)):
+            ## comparison works correctly
             if (true[k] == current_class):
                 occurrences_true += 1
                 if (pred[k] == current_class):
@@ -171,11 +186,17 @@ def fscore(pred, true, f_val):
                 occurrences_pred += 1
                 if (true[k] == current_class):
                     hits_given_pred +=1
-
-        prec = hits_given_pred/occurrences_pred
-        rec = hits_given_true/occurrences_true
+        # print(str(current_class), occurrences_pred, occurrences_true, hits_given_pred, hits_given_true)
+        if (occurrences_pred == 0):
+            prec = 0
+        else:
+            prec = hits_given_pred/occurrences_pred
+        if (occurrences_true == 0):
+            rec = 0
+        else:
+            rec = hits_given_true/occurrences_true
         if (prec == 0 and rec == 0):
-            subsum = 0
+            subsum += 0
         else:
             subsum += (((f_val_squared+1) * prec * rec) / ((f_val_squared * prec) + rec))
 
@@ -201,8 +222,7 @@ def euclidean_distance(point: np.array, data: np.array) -> np.array:
     for i in range(len(data)):
         subsum = 0
         for j in range(len(point)):
-            if (isinstance(point[j], int) or isinstance(point[j], np.int64)):
-                subsum += (point[j] - data[i][j]) * (point[j] - data[i][j])
+            subsum += (point[j] - data[i][j]) * (point[j] - data[i][j])
         distance.append(round(math.sqrt(subsum), 8))
     return np.array(distance)
 
